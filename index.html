@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0" />
+  <title>Glassmorphic Course Portal</title>
+  <style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.28);
+      --glass-highlight: rgba(255, 255, 255, 0.22);
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.75);
+      --accent: #38bdf8;
+      --danger: #fb7185;
+      --danger-bg: rgba(251, 113, 133, 0.2);
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 15% 20%, #1e1b4b, #0f172a 55%, #020617);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb-1 { width: 280px; height: 280px; background: #6366f1; top: 6%; left: 10%; opacity: 0.45; }
+    .orb-2 { width: 250px; height: 250px; background: #ec4899; bottom: 8%; right: 10%; opacity: 0.35; }
+    .orb-3 { width: 220px; height: 220px; background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.25; }
+
+    .phone-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      min-height: 650px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 22px 18px 82px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255,255,255,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .admin-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--glass-highlight);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+
+    .admin-btn:hover {
+      transform: scale(1.06);
+      background: rgba(56, 189, 248, 0.35);
+    }
+
+    .screen-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      text-align: center;
+      flex: 1;
+      margin-right: 38px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .glass-pill {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .glass-pill:active, .glass-pill:hover {
+      background: var(--glass-highlight);
+    }
+
+    .icon-del-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: 0.2s;
+    }
+
+    .icon-del-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .glass-input, .glass-select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .glass-input::placeholder { color: var(--text-muted); }
+    .glass-select option { background: #0f172a; color: #fff; }
+
+    .upload-box {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.18);
+      border: 1px dashed var(--accent);
+      cursor: pointer;
+      font-size: 0.9rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .file-input-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .submit-pill {
+      margin-top: 8px;
+      text-align: center;
+      justify-content: center;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(56,189,248,0.5), rgba(99,102,241,0.5));
+    }
+
+    .danger-pill {
+      margin-top: 6px;
+      text-align: center;
+      justify-content: center;
+      font-weight: 600;
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: #ffdbe3;
+    }
+
+    .danger-pill:hover { background: rgba(251, 113, 133, 0.4); }
+
+    .chapter-tree {
+      border-left: 2px solid var(--glass-border);
+      margin-left: 14px;
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .chapter-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chapter-row::before {
+      content: "";
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      width: 16px;
+      height: 2px;
+      background: var(--glass-border);
+    }
+
+    .chapter-item {
+      flex: 1;
+      cursor: pointer;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.2s;
+    }
+
+    .chapter-item:hover { background: var(--glass-highlight); }
+
+    .pdf-container {
+      margin-top: 10px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--glass-border);
+      height: 400px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pdf-container { touch-action: pan-x pan-y; align-items: flex-start; }
+    #pdfPages { flex-shrink: 0; }
+
+    .zoom-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .zoom-btn {
+      min-width: 42px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--glass-highlight);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .zoom-btn:active { background: rgba(56, 189, 248, 0.35); }
+
+    #view-pdf.pdf-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100%;
+      height: 100dvh;
+      padding: calc(env(safe-area-inset-top, 0px) + 6px) 6px calc(env(safe-area-inset-bottom, 0px) + 6px);
+      background: radial-gradient(circle at 15% 20%, #1e1b4b, #0f172a 55%, #020617);
+      overflow: hidden;
+    }
+
+    #view-pdf.pdf-fullscreen #selectedChapterBanner { flex-shrink: 0; padding: 6px 12px !important; }
+
+    #view-pdf.pdf-fullscreen .pdf-container {
+      flex: 1;
+      min-height: 0;
+      height: auto;
+      margin-top: 6px;
+      border-radius: 12px;
+    }
+
+    #view-pdf.pdf-fullscreen .zoom-bar { flex-shrink: 0; margin-top: 6px; }
+
+    .pdf-page {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    .pdf-msg {
+      margin: auto;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .pdf-open-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--accent);
+    }
+
+    .pdf-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 99;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 340px;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 22px 18px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 82%;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-arrow {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .nav-arrow:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      font-size: 0.82rem;
+      margin-top: 8px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
+      <h3 style="font-size:1.05rem; margin-bottom:6px;">Confirm Removal</h3>
+      <p id="confirmModalText" style="font-size:0.85rem; color:var(--text-muted);"></p>
+      <div class="modal-actions">
+        <button class="glass-pill" style="justify-content:center; padding:10px;" onclick="closeConfirmModal()">Cancel</button>
+        <button class="glass-pill danger-pill" style="margin-top:0; padding:10px;" id="confirmModalYesBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone-card">
+    <div>
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="admin-btn" id="adminToggleBtn" onclick="openAdminLogin()" title="Admin Panel">🔒</button>
+        <h1 class="screen-title" id="screenTitle">Courses</h1>
+      </div>
+
+      <!-- USER VIEW 1: COURSES LIST -->
+      <div id="view-courses" class="view-section">
+        <div class="pill-list" id="courseListContainer"></div>
+      </div>
+
+      <!-- USER VIEW 2: CHAPTERS LIST -->
+      <div id="view-chapters" class="view-section hidden">
+        <div class="glass-pill" id="selectedCourseBanner" style="justify-content:center; font-weight:600;"></div>
+        <div class="chapter-tree" id="chapterListContainer"></div>
+      </div>
+
+      <!-- USER VIEW 3: PDF VIEWER -->
+      <div id="view-pdf" class="view-section hidden">
+        <div class="glass-pill" id="selectedChapterBanner" style="justify-content:center; font-size:0.9rem; padding:10px 14px;"></div>
+        <div class="pdf-container" id="pdfViewerBox">
+          <div id="pdfPages" style="width:100%;"></div>
+        </div>
+        <div class="zoom-bar">
+          <button class="zoom-btn" onclick="setPdfZoom(pdfZoom / 1.25)" aria-label="Zoom out">−</button>
+          <button class="zoom-btn" id="zoomLabel" onclick="setPdfZoom(1)" aria-label="Reset zoom">100%</button>
+          <button class="zoom-btn" onclick="setPdfZoom(pdfZoom * 1.25)" aria-label="Zoom in">+</button>
+          <button class="zoom-btn" id="fsBtn" onclick="togglePdfFullscreen()" aria-label="Toggle full screen">⛶</button>
+        </div>
+      </div>
+
+      <!-- STRONG ADMIN LOGIN VIEW (Clean with no hints displayed) -->
+      <div id="view-login" class="view-section hidden">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; text-align:center;">
+          Restricted Admin Access
+        </p>
+        <div class="pill-list">
+          <input type="text" id="adminUser" class="glass-input" placeholder="Admin Username" autocomplete="off" />
+          <input type="password" id="adminPass" class="glass-input" placeholder="Strong Password" />
+          <input type="password" id="adminPin" class="glass-input" placeholder="4-Digit Security PIN" maxlength="4" />
+          <button class="glass-pill submit-pill" onclick="handleAdminLogin()">Verify & Login</button>
+        </div>
+        <div class="status-msg" id="loginStatus"></div>
+      </div>
+
+      <!-- ADMIN VIEW 1: DASHBOARD -->
+      <div id="view-admin-home" class="view-section hidden">
+        <div class="pill-list">
+          <button class="glass-pill" onclick="navigateTo('view-add-course')">
+            <span>Add a new course</span> <span>➕</span>
+          </button>
+          <button class="glass-pill" onclick="navigateTo('view-add-chapter')">
+            <span>Add a chapter to existing course</span> <span>📑</span>
+          </button>
+          <button class="glass-pill" onclick="navigateTo('view-history')">
+            <span>Web history and Analysis</span> <span>📊</span>
+          </button>
+          <button class="glass-pill" onclick="navigateTo('view-courses')">
+            <span>Browse Courses (with Quick Delete 🗑️)</span> <span>📚</span>
+          </button>
+          <button class="glass-pill danger-pill" onclick="logoutAdmin()">
+            <span>Logout Admin</span> <span>🚪</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ADMIN VIEW 2: ADD NEW COURSE -->
+      <div id="view-add-course" class="view-section hidden">
+        <div class="pill-list">
+          <input type="text" id="newCourseName" class="glass-input" placeholder="Course name" />
+          <input type="number" id="newCourseChapterNo" class="glass-input" placeholder="Chapter no (e.g. 1)" min="1" />
+          <label class="upload-box">
+            <span>⬆️ Tap to Select PDF File</span>
+            <input type="file" id="newCoursePdf" class="file-input-overlay" accept=".pdf,application/pdf" onchange="updateFileLabel(this, 'newCourseFileLabel')" />
+          </label>
+          <span id="newCourseFileLabel" style="font-size:0.8rem; color:var(--text-muted); text-align:center;">No PDF chosen</span>
+          <button class="glass-pill submit-pill" onclick="submitNewCourse()">Submit</button>
+        </div>
+        <div class="status-msg" id="addCourseStatus"></div>
+      </div>
+
+      <!-- ADMIN VIEW 3: ADD CHAPTER TO EXISTING -->
+      <div id="view-add-chapter" class="view-section hidden">
+        <div class="pill-list">
+          <select id="existingCourseSelect" class="glass-select"></select>
+          <input type="number" id="existingChapterNo" class="glass-input" placeholder="Chapter no" min="1" />
+          <label class="upload-box">
+            <span>⬆️ Tap to Select PDF File</span>
+            <input type="file" id="existingChapterPdf" class="file-input-overlay" accept=".pdf,application/pdf" onchange="updateFileLabel(this, 'existingFileLabel')" />
+          </label>
+          <span id="existingFileLabel" style="font-size:0.8rem; color:var(--text-muted); text-align:center;">No PDF chosen</span>
+          <button class="glass-pill submit-pill" onclick="submitExistingChapter()">Submit</button>
+        </div>
+        <div class="status-msg" id="addChapterStatus"></div>
+      </div>
+
+      <!-- ADMIN VIEW 4: WEB HISTORY & ANALYSIS -->
+      <div id="view-history" class="view-section hidden">
+        <div class="pill-list" id="historyLogContainer" style="max-height:380px; overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Pill (<- ->) -->
+    <div class="bottom-nav">
+      <button class="nav-arrow" id="backBtn" onclick="goBack()">←</button>
+      <span style="font-size:0.75rem; color:var(--text-muted);" id="viewIndicator">User Mode</span>
+      <button class="nav-arrow" id="forwardBtn" onclick="goForward()">→</button>
+    </div>
+  </div>
+
+  <script>
+    const coursesData = [
+      {
+        name: "Computer Science",
+        chapters: [
+          { number: 1, title: "Chapter 1", pdfUrl: null, pdfName: "CS_Chapter_1.pdf" },
+          { number: 2, title: "Chapter 2", pdfUrl: null, pdfName: "CS_Chapter_2.pdf" }
+        ]
+      },
+      {
+        name: "Web Engineering",
+        chapters: [
+          { number: 1, title: "Chapter 1", pdfUrl: null, pdfName: "Web_Chapter_1.pdf" }
+        ]
+      }
+    ];
+
+    let currentCourseIndex = 0;
+    let currentChapterIndex = 0;
+    let isAdminAuthenticated = false;
+
+    let historyStack = ['view-courses'];
+    let historyPointer = 0;
+
+    const activityLogs = [
+      { time: new Date().toLocaleTimeString(), event: "Portal initialized" }
+    ];
+
+    function logEvent(eventText) {
+      activityLogs.unshift({ time: new Date().toLocaleTimeString(), event: eventText });
+    }
+
+    let pendingConfirmAction = null;
+
+    function openConfirmModal(message, onConfirm) {
+      document.getElementById('confirmModalText').textContent = message;
+      pendingConfirmAction = onConfirm;
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      pendingConfirmAction = null;
+      document.getElementById('confirmModal').classList.add('hidden');
+    }
+
+    document.getElementById('confirmModalYesBtn').onclick = () => {
+      if (pendingConfirmAction) pendingConfirmAction();
+      closeConfirmModal();
+    };
+
+    let failedAttempts = 0;
+    let lockoutUntil = 0;
+
+    function fallbackHash(str) {
+      let h1 = 0xdeadbeef ^ str.length, h2 = 0x41c6ce57 ^ str.length;
+      for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
+    }
+
+    async function computeHash(message) {
+      if (window.crypto && window.crypto.subtle) {
+        try {
+          const msgBuffer = new TextEncoder().encode(message);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+          return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+          return fallbackHash(message);
+        }
+      }
+      return fallbackHash(message);
+    }
+
+    function hasStrongComplexity(password) {
+      return password.length >= 8 &&
+             /[A-Z]/.test(password) &&
+             /[a-z]/.test(password) &&
+             /[0-9]/.test(password) &&
+             /[^A-Za-z0-9]/.test(password);
+    }
+
+    async function handleAdminLogin() {
+      const statusEl = document.getElementById('loginStatus');
+      const now = Date.now();
+
+      if (now < lockoutUntil) {
+        const remaining = Math.ceil((lockoutUntil - now) / 1000);
+        statusEl.style.color = 'var(--danger)';
+        statusEl.textContent = `Locked! Try again in ${remaining}s.`;
+        return;
+      }
+
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value;
+      const pin = document.getElementById('adminPin').value.trim();
+
+      if (!hasStrongComplexity(pass)) {
+        statusEl.style.color = 'var(--danger)';
+        statusEl.textContent = "Password needs 8+ chars, upper, lower, number & symbol.";
+        return;
+      }
+
+      const inputHash = await computeHash(`${user}:${pass}:${pin}`);
+      const targetHash = await computeHash("admin:Miles@2026!:3690");
+
+      if (inputHash === targetHash) {
+        failedAttempts = 0;
+        isAdminAuthenticated = true;
+        statusEl.style.color = 'var(--success)';
+        statusEl.textContent = "Authentication successful!";
+        logEvent("Admin logged in");
+        document.getElementById('adminToggleBtn').textContent = "🛡️";
+        setTimeout(() => navigateTo('view-admin-home'), 300);
+      } else {
+        failedAttempts++;
+        logEvent(`Failed login (#${failedAttempts})`);
+        if (failedAttempts >= 3) {
+          lockoutUntil = Date.now() + 30000;
+          statusEl.style.color = 'var(--danger)';
+          statusEl.textContent = "3 failed attempts! Locked for 30s.";
+        } else {
+          statusEl.style.color = 'var(--danger)';
+          statusEl.textContent = `Invalid credentials (${3 - failedAttempts} tries left).`;
+        }
+      }
+    }
+
+    function openAdminLogin() {
+      navigateTo(isAdminAuthenticated ? 'view-admin-home' : 'view-login');
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      document.getElementById('adminToggleBtn').textContent = "🔒";
+      logEvent("Admin logged out");
+      navigateTo('view-courses');
+    }
+
+    const viewTitles = {
+      'view-courses': 'Courses',
+      'view-chapters': 'Chapters',
+      'view-pdf': 'PDF Viewer',
+      'view-login': 'Admin Login',
+      'view-admin-home': 'Admin View',
+      'view-add-course': 'Add New Course',
+      'view-add-chapter': 'Add Chapter',
+      'view-history': 'Web History & Analysis'
+    };
+
+    function showView(viewId) {
+      if (viewId !== 'view-pdf') exitPdfFullscreen();
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(viewId).classList.remove('hidden');
+      document.getElementById('screenTitle').textContent = viewTitles[viewId] || 'Portal';
+      document.getElementById('viewIndicator').textContent = isAdminAuthenticated ? 'Admin Mode 🛡️' : 'User Mode';
+
+      if (viewId === 'view-courses') renderCourses();
+      if (viewId === 'view-chapters') renderChaptersList();
+      if (viewId === 'view-add-chapter') populateCourseDropdown();
+      if (viewId === 'view-history') renderHistory();
+
+      document.getElementById('backBtn').disabled = historyPointer <= 0;
+      document.getElementById('forwardBtn').disabled = historyPointer >= historyStack.length - 1;
+    }
+
+    function navigateTo(viewId) {
+      historyStack = historyStack.slice(0, historyPointer + 1);
+      historyStack.push(viewId);
+      historyPointer++;
+      showView(viewId);
+    }
+
+    function goBack() {
+      if (isPdfFullscreen()) { exitPdfFullscreen(); return; }
+      if (historyPointer > 0) {
+        historyPointer--;
+        showView(historyStack[historyPointer]);
+      }
+    }
+
+    function goForward() {
+      if (historyPointer < historyStack.length - 1) {
+        historyPointer++;
+        showView(historyStack[historyPointer]);
+      }
+    }
+
+    function renderCourses() {
+      const container = document.getElementById('courseListContainer');
+      container.innerHTML = '';
+
+      if (coursesData.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:24px;">No courses available.</p>`;
+        return;
+      }
+
+      coursesData.forEach((course, idx) => {
+        const row = document.createElement('div');
+        row.className = 'pill-row';
+
+        const btn = document.createElement('button');
+        btn.className = 'glass-pill';
+        btn.innerHTML = `<span>${course.name} <small style="color:var(--text-muted);">(${course.chapters.length} ch)</small></span> <span>→</span>`;
+        btn.onclick = () => selectCourse(idx);
+        row.appendChild(btn);
+
+        if (isAdminAuthenticated) {
+          const delBtn = document.createElement('button');
+          delBtn.className = 'icon-del-btn';
+          delBtn.innerHTML = '🗑️';
+          delBtn.title = `Delete ${course.name}`;
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            confirmDeleteCourse(idx);
+          };
+          row.appendChild(delBtn);
+        }
+
+        container.appendChild(row);
+      });
+    }
+
+    function selectCourse(index) {
+      if (!coursesData[index]) return;
+      currentCourseIndex = index;
+      logEvent(`Viewed course: ${coursesData[index].name}`);
+      navigateTo('view-chapters');
+    }
+
+    function renderChaptersList() {
+      const course = coursesData[currentCourseIndex];
+      if (!course) {
+        navigateTo('view-courses');
+        return;
+      }
+
+      document.getElementById('selectedCourseBanner').textContent = course.name;
+      const list = document.getElementById('chapterListContainer');
+      list.innerHTML = '';
+
+      if (course.chapters.length === 0) {
+        list.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">No chapters in this course yet.</p>`;
+        return;
+      }
+
+      course.chapters.forEach((ch, cIdx) => {
+        const row = document.createElement('div');
+        row.className = 'chapter-row';
+
+        const item = document.createElement('div');
+        item.className = 'chapter-item';
+        item.innerHTML = `<span>${ch.title}</span> <small style="color:var(--accent);">📄 Read PDF</small>`;
+        item.onclick = () => selectChapter(cIdx);
+        row.appendChild(item);
+
+        if (isAdminAuthenticated) {
+          const delBtn = document.createElement('button');
+          delBtn.className = 'icon-del-btn';
+          delBtn.style.width = '38px';
+          delBtn.style.height = '38px';
+          delBtn.innerHTML = '🗑️';
+          delBtn.title = `Delete ${ch.title}`;
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            confirmDeleteChapter(currentCourseIndex, cIdx);
+          };
+          row.appendChild(delBtn);
+        }
+
+        list.appendChild(row);
+      });
+    }
+
+    function confirmDeleteCourse(courseIdx) {
+      const course = coursesData[courseIdx];
+      if (!course) return;
+      openConfirmModal(`Remove course "${course.name}" and all chapters?`, () => {
+        coursesData.splice(courseIdx, 1);
+        logEvent(`Admin removed course: ${course.name}`);
+        renderCourses();
+      });
+    }
+
+    function confirmDeleteChapter(courseIdx, chapterIdx) {
+      const course = coursesData[courseIdx];
+      if (!course || !course.chapters[chapterIdx]) return;
+      const chTitle = course.chapters[chapterIdx].title;
+      openConfirmModal(`Remove "${chTitle}" from "${course.name}"?`, () => {
+        course.chapters.splice(chapterIdx, 1);
+        logEvent(`Admin removed ${chTitle} from ${course.name}`);
+        renderChaptersList();
+      });
+    }
+
+    // ---- Zoom (pinch, buttons, double-tap, Ctrl+wheel) ----
+    let pdfZoom = 1;
+    const PDF_MIN_ZOOM = 1, PDF_MAX_ZOOM = 4, PDF_PAD = 10;
+
+    function pdfBaseWidth() {
+      return Math.max(document.getElementById('pdfViewerBox').clientWidth - PDF_PAD * 2, 200);
+    }
+
+    // Zoom around a focal point given in viewport coordinates (defaults to box centre)
+    function setPdfZoom(z, cx, cy) {
+      const box = document.getElementById('pdfViewerBox');
+      const pages = document.getElementById('pdfPages');
+      z = Math.min(PDF_MAX_ZOOM, Math.max(PDF_MIN_ZOOM, z));
+      const r = box.getBoundingClientRect();
+      if (cx === undefined) { cx = r.left + r.width / 2; cy = r.top + r.height / 2; }
+      const oldW = pages.offsetWidth || 1, oldH = pages.offsetHeight || 1;
+      const relX = (box.scrollLeft + cx - r.left - PDF_PAD) / oldW;
+      const relY = (box.scrollTop + cy - r.top - PDF_PAD) / oldH;
+      pdfZoom = z;
+      pages.style.width = (pdfBaseWidth() * z) + 'px';
+      pages.style.alignSelf = 'flex-start';
+      box.scrollLeft = relX * pages.offsetWidth + PDF_PAD - (cx - r.left);
+      box.scrollTop = relY * pages.offsetHeight + PDF_PAD - (cy - r.top);
+      document.getElementById('zoomLabel').textContent = Math.round(z * 100) + '%';
+    }
+
+    (function initPdfGestures() {
+      const box = document.getElementById('pdfViewerBox');
+      const pages = document.getElementById('pdfPages');
+      let pinch = null, lastTap = 0;
+
+      const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      const center = t => ({ x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 });
+
+      box.addEventListener('touchstart', e => {
+        if (e.touches.length === 2) {
+          const c = center(e.touches), r = box.getBoundingClientRect();
+          pinch = {
+            d: dist(e.touches), z: pdfZoom,
+            relX: (box.scrollLeft + c.x - r.left - PDF_PAD) / (pages.offsetWidth || 1),
+            relY: (box.scrollTop + c.y - r.top - PDF_PAD) / (pages.offsetHeight || 1)
+          };
+        } else if (e.touches.length === 1) {
+          pinch = null;
+        }
+      }, { passive: true });
+
+      box.addEventListener('touchmove', e => {
+        if (e.touches.length !== 2 || !pinch) return;
+        e.preventDefault();
+        const c = center(e.touches), r = box.getBoundingClientRect();
+        const z = Math.min(PDF_MAX_ZOOM, Math.max(PDF_MIN_ZOOM, pinch.z * dist(e.touches) / pinch.d));
+        pdfZoom = z;
+        pages.style.width = (pdfBaseWidth() * z) + 'px';
+        pages.style.alignSelf = 'flex-start';
+        box.scrollLeft = pinch.relX * pages.offsetWidth + PDF_PAD - (c.x - r.left);
+        box.scrollTop = pinch.relY * pages.offsetHeight + PDF_PAD - (c.y - r.top);
+        document.getElementById('zoomLabel').textContent = Math.round(z * 100) + '%';
+      }, { passive: false });
+
+      box.addEventListener('touchend', e => {
+        if (e.touches.length < 2) pinch = null;
+        // double-tap to toggle 1x / 2.5x
+        if (e.touches.length === 0 && e.changedTouches.length === 1) {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            const t = e.changedTouches[0];
+            setPdfZoom(pdfZoom > 1.05 ? 1 : 2.5, t.clientX, t.clientY);
+            lastTap = 0;
+          } else {
+            lastTap = now;
+          }
+        }
+      }, { passive: true });
+
+      // Ctrl + wheel / trackpad pinch on PC
+      box.addEventListener('wheel', e => {
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+        setPdfZoom(pdfZoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+      }, { passive: false });
+
+      window.addEventListener('resize', () => setPdfZoom(pdfZoom));
+    })();
+
+    // ---- Full screen ----
+    let pdfFsPlaceholder = null;
+
+    function isPdfFullscreen() {
+      return document.getElementById('view-pdf').classList.contains('pdf-fullscreen');
+    }
+
+    function enterPdfFullscreen() {
+      const v = document.getElementById('view-pdf');
+      if (isPdfFullscreen()) return;
+      // Move to <body> so position:fixed isn't trapped by a parent's blur/transform
+      pdfFsPlaceholder = document.createComment('pdf-view');
+      v.parentNode.insertBefore(pdfFsPlaceholder, v);
+      document.body.appendChild(v);
+      v.classList.add('pdf-fullscreen');
+      document.getElementById('fsBtn').textContent = '✕';
+      // Real fullscreen where supported (not iPhone Safari); CSS overlay is the fallback
+      const req = v.requestFullscreen || v.webkitRequestFullscreen;
+      if (req) { try { const p = req.call(v); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+      setTimeout(() => setPdfZoom(pdfZoom), 50);
+    }
+
+    function exitPdfFullscreen() {
+      const v = document.getElementById('view-pdf');
+      if (!isPdfFullscreen()) return;
+      v.classList.remove('pdf-fullscreen');
+      if (pdfFsPlaceholder && pdfFsPlaceholder.parentNode) {
+        pdfFsPlaceholder.parentNode.insertBefore(v, pdfFsPlaceholder);
+        pdfFsPlaceholder.remove();
+      }
+      pdfFsPlaceholder = null;
+      document.getElementById('fsBtn').textContent = '⛶';
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fsEl) {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        try { const p = ex.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+      }
+      setTimeout(() => setPdfZoom(pdfZoom), 50);
+    }
+
+    function togglePdfFullscreen() {
+      isPdfFullscreen() ? exitPdfFullscreen() : enterPdfFullscreen();
+    }
+
+    // Leaving native fullscreen with Esc / system gesture also closes the overlay
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev =>
+      document.addEventListener(ev, () => {
+        if (!(document.fullscreenElement || document.webkitFullscreenElement)) exitPdfFullscreen();
+      }));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') exitPdfFullscreen(); });
+
+    let pdfRenderToken = 0;
+
+    async function renderPdf(chapter) {
+      const box = document.getElementById('pdfViewerBox');
+      const pages = document.getElementById('pdfPages');
+      const token = ++pdfRenderToken;
+      pages.innerHTML = '';
+      box.scrollTop = 0;
+      box.scrollLeft = 0;
+      setPdfZoom(1);
+
+      const showMsg = (html) => { pages.innerHTML = '<div class="pdf-msg">' + html + '</div>'; };
+
+      if (!chapter.pdfUrl) {
+        showMsg('No PDF has been uploaded for this chapter yet.');
+        return;
+      }
+      if (!window.pdfjsLib) {
+        showMsg('PDF viewer could not load (check your internet connection).<br><a class="pdf-open-link" href="' + chapter.pdfUrl + '" target="_blank" rel="noopener">Open PDF</a>');
+        return;
+      }
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      showMsg('Loading PDF…');
+
+      try {
+        const pdf = await pdfjsLib.getDocument({ url: chapter.pdfUrl }).promise;
+        if (token !== pdfRenderToken) return;
+        pages.innerHTML = '';
+        const cssWidth = Math.max(box.clientWidth - 20, 200);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          if (token !== pdfRenderToken) return;
+          const base = page.getViewport({ scale: 1 });
+          const targetPx = Math.min(cssWidth * dpr * 2, 2000);
+        const scale = targetPx / base.width;
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.className = 'pdf-page';
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          pages.appendChild(canvas);
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        }
+      } catch (err) {
+        if (token !== pdfRenderToken) return;
+        showMsg('Could not display this PDF.<br><a class="pdf-open-link" href="' + chapter.pdfUrl + '" target="_blank" rel="noopener">Open PDF in new tab</a>');
+      }
+    }
+
+    function selectChapter(chapterIdx) {
+      currentChapterIndex = chapterIdx;
+      const course = coursesData[currentCourseIndex];
+      const chapter = course.chapters[chapterIdx];
+      logEvent(`Opened ${course.name} - ${chapter.title}`);
+
+      document.getElementById('selectedChapterBanner').textContent = `${course.name} - ${chapter.title}`;
+      renderPdf(chapter);
+      navigateTo('view-pdf');
+    }
+
+    function updateFileLabel(inputEl, labelId) {
+      const label = document.getElementById(labelId);
+      if (inputEl.files && inputEl.files[0]) {
+        label.style.color = 'var(--success)';
+        label.textContent = `✅ Ready: ${inputEl.files[0].name}`;
+      } else {
+        label.style.color = 'var(--text-muted)';
+        label.textContent = "No PDF chosen";
+      }
+    }
+
+    function submitNewCourse() {
+      const name = document.getElementById('newCourseName').value.trim();
+      const chNo = document.getElementById('newCourseChapterNo').value.trim() || "1";
+      const fileInput = document.getElementById('newCoursePdf');
+      const status = document.getElementById('addCourseStatus');
+
+      if (!name) {
+        status.style.color = 'var(--danger)';
+        status.textContent = "Please enter a course name.";
+        return;
+      }
+
+      const file = fileInput.files && fileInput.files[0];
+      const pdfUrl = file ? URL.createObjectURL(file) : null;
+      const pdfName = file ? file.name : `${name}_Chapter_${chNo}.pdf`;
+
+      const newCourseIdx = coursesData.length;
+      coursesData.push({
+        name,
+        chapters: [{ number: Number(chNo), title: `Chapter ${chNo}`, pdfUrl, pdfName }]
+      });
+
+      logEvent(`Admin added course: ${name} (Chapter ${chNo})`);
+      status.style.color = 'var(--success)';
+      status.textContent = `Course "${name}" added!`;
+
+      document.getElementById('newCourseName').value = '';
+      document.getElementById('newCourseChapterNo').value = '';
+      fileInput.value = '';
+      document.getElementById('newCourseFileLabel').textContent = 'No PDF chosen';
+
+      setTimeout(() => {
+        currentCourseIndex = newCourseIdx;
+        selectChapter(0);
+      }, 400);
+    }
+
+    function populateCourseDropdown() {
+      const select = document.getElementById('existingCourseSelect');
+      select.innerHTML = '<option value="" disabled selected>Choose a course</option>';
+      coursesData.forEach((c, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${c.name} (${c.chapters.length} ch)`;
+        select.appendChild(opt);
+      });
+    }
+
+    function submitExistingChapter() {
+      const courseIdx = document.getElementById('existingCourseSelect').value;
+      const chNo = document.getElementById('existingChapterNo').value.trim();
+      const fileInput = document.getElementById('existingChapterPdf');
+      const status = document.getElementById('addChapterStatus');
+
+      if (courseIdx === "" || !chNo) {
+        status.style.color = 'var(--danger)';
+        status.textContent = "Please choose a course and chapter number.";
+        return;
+      }
+
+      const course = coursesData[Number(courseIdx)];
+      const file = fileInput.files && fileInput.files[0];
+      const pdfUrl = file ? URL.createObjectURL(file) : null;
+      const pdfName = file ? file.name : `${course.name}_Chapter_${chNo}.pdf`;
+
+      const newChIdx = course.chapters.length;
+      course.chapters.push({
+        number: Number(chNo),
+        title: `Chapter ${chNo}`,
+        pdfUrl,
+        pdfName
+      });
+
+      logEvent(`Admin added Chapter ${chNo} to ${course.name}`);
+      status.style.color = 'var(--success)';
+      status.textContent = `Chapter ${chNo} added!`;
+
+      document.getElementById('existingChapterNo').value = '';
+      fileInput.value = '';
+      document.getElementById('existingFileLabel').textContent = 'No PDF chosen';
+
+      setTimeout(() => {
+        currentCourseIndex = Number(courseIdx);
+        selectChapter(newChIdx);
+      }, 400);
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('historyLogContainer');
+      const totalChapters = coursesData.reduce((sum, c) => sum + c.chapters.length, 0);
+      container.innerHTML = `
+        <div class="glass-pill" style="cursor:default;">
+          <span>Courses: <b>${coursesData.length}</b> | Chapters: <b>${totalChapters}</b></span>
+          <span>Logs: <b>${activityLogs.length}</b></span>
+        </div>
+      `;
+      activityLogs.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'glass-pill';
+        row.style.fontSize = '0.82rem';
+        row.style.cursor = 'default';
+        row.innerHTML = `<span>${item.event}</span> <span style="color:var(--text-muted);">${item.time}</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    showView('view-courses');
+  </script>
+</body>
+</html>
